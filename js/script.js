@@ -10,19 +10,34 @@ sliders.forEach(slider=>{
     slider.addEventListener('input', hslControls)
 });
 
+colorDivs.forEach((div,index)=>{
+div.addEventListener('input', ()=>{
+    updateTextUI(index);
 
+})
+
+
+});
 
 //functions
 //color generator
 function generateHex(){
     const hexColor = chroma.random();
     return hexColor;
-}
+};
+
 
 function randomColors(){
+
+    initialColors = [];
+    //
     colorDivs.forEach((div,index,)=>{
         const hexText = div.children[0];
         const randomColor = generateHex();
+        initialColors.push(chroma(randomColor).hex());
+
+        console.log(initialColors);
+
         //add the color to the background 
         div.style.backgroundColor = randomColor;
         hexText.innerText = randomColor;
@@ -75,14 +90,15 @@ function hslControls(e){
     const index = e.target.getAttribute('data-bright')||
     e.target.getAttribute('data-sat')||
     e.target.getAttribute('data-hue');
-   
 
     let sliders = e.target.parentElement.querySelectorAll("input[type='range']");
     const hue = sliders[0];
     const brightness = sliders[1];
     const saturation = sliders[2];
 
-    const bgColor = colorDivs[index].querySelector('h2').innerText;
+    const bgColor = initialColors[index];
+
+    console.log(bgColor);
 
     let color = chroma(bgColor)
     .set('hsl.s',saturation.value)
@@ -90,9 +106,24 @@ function hslControls(e){
     .set('hsl.h',hue.value)
 
     colorDivs[index].style.backgroundColor = color;
-    console.log(saturation.value);
 
 }
+
+function updateTextUI(index){
+    const activeDiv = colorDivs[index];
+    const color = chroma(activeDiv.style.backgroundColor);
+    const hexText = activeDiv.querySelector('h2');
+    const icons = activeDiv.querySelectorAll('.controls button');
+    hexText.innerText = color.hex();
+//check contrast
+checkTextContrast(color,hexText);
+
+for (icon of icons){
+    checkTextContrast(color,icon);
+}
+};
+
+
 
 
 randomColors();
